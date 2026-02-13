@@ -1,0 +1,17 @@
+{
+    "name": "cortex-root",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install && cd ../scripts && npm install",
+        "db:setup": "cd backend && npx prisma generate && npx prisma migrate dev --name init && npx prisma db seed",
+        "predev": "npx kill-port 5001 5173",
+        "dev": "concurrently --kill-others \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:simulator\"",
+        "dev:backend": "cd backend && npm run dev",
+        "dev:frontend": "cd frontend && npm run dev",
+        "dev:simulator": "cd scripts && npm start"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    }
+}
