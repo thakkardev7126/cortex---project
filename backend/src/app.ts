@@ -23,6 +23,15 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'ok', timestamp: new Date() });
 });
 
+// Welcome Route
+app.get('/', (req, res) => {
+    res.json({
+        status: 'ok',
+        service: 'cortex-backend',
+        message: 'Backend is live 🚀'
+    });
+});
+
 // Routes
 import authRoutes from './routes/authRoutes';
 import eventRoutes from './routes/eventRoutes';
