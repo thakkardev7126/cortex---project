@@ -11,7 +11,7 @@ router.post('/login', login);
 export default router;*/
 
 
-import { Router } from "express";
+/*import { Router } from "express";
 import { PrismaClient } from "@prisma/client";
 
 const router = Router();
@@ -28,5 +28,15 @@ router.get("/db-connection", async (req, res) => {
         });
     }
 });
+
+export default router;*/
+
+import { Router } from "express";
+import { register, login } from "../controllers/authController";
+
+const router = Router();
+
+router.post("/register", register);
+router.post("/login", login);
 
 export default router;
