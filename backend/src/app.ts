@@ -25,14 +25,35 @@ app.get('/health', (req, res) => {
 
 // Welcome Route
 app.get('/', (req, res) => {
-    res.send("Cortex backend is running 🚀");
+    res.json({
+        service: "Cortex Backend",
+        status: "running",
+        docs: "/health"
+    });
 });
+
+
+
 
 // Routes
 import authRoutes from './routes/authRoutes';
 import eventRoutes from './routes/eventRoutes';
 import dashboardRoutes from './routes/dashboardRoutes';
 import analysisRoutes from './routes/analysisRoutes';
+
+// DB Connection Test
+app.get('/api/test/db-connection', async (req, res) => {
+    try {
+        await prisma.$queryRaw`SELECT 1`;
+        res.json({ connected: true });
+    } catch (error) {
+        console.error("Database connection error:", error);
+        res.status(500).json({
+            connected: false,
+            error: "Database connection failed"
+        });
+    }
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);

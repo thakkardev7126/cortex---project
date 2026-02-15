@@ -23,13 +23,35 @@ app.use((0, cookie_parser_1.default)());
 app.use((0, morgan_1.default)('dev'));
 // Health Check
 app.get('/health', (req, res) => {
-    res.status(200).json({ status: 'ok', timestamp: new Date() });
+    res.json({ status: "ok" });
+});
+// Welcome Route
+app.get('/', (req, res) => {
+    res.json({
+        service: "Cortex Backend",
+        status: "running",
+        docs: "/health"
+    });
 });
 // Routes
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 const eventRoutes_1 = __importDefault(require("./routes/eventRoutes"));
 const dashboardRoutes_1 = __importDefault(require("./routes/dashboardRoutes"));
 const analysisRoutes_1 = __importDefault(require("./routes/analysisRoutes"));
+// DB Connection Test
+app.get('/api/test/db-connection', async (req, res) => {
+    try {
+        await exports.prisma.$queryRaw `SELECT 1`;
+        res.json({ connected: true });
+    }
+    catch (error) {
+        console.error("Database connection error:", error);
+        res.status(500).json({
+            connected: false,
+            error: "Database connection failed"
+        });
+    }
+});
 app.use('/api/auth', authRoutes_1.default);
 app.use('/api/events', eventRoutes_1.default);
 app.use('/api/dashboard', dashboardRoutes_1.default);
