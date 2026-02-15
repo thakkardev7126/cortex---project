@@ -25,11 +25,7 @@ app.get('/health', (req, res) => {
 
 // Welcome Route
 app.get('/', (req, res) => {
-    res.json({
-        status: 'ok',
-        service: 'cortex-backend',
-        message: 'Backend is live 🚀'
-    });
+    res.send("Backend is running 🚀");
 });
 
 // Routes
