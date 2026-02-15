@@ -20,12 +20,12 @@ app.use(morgan('dev'));
 
 // Health Check
 app.get('/health', (req, res) => {
-    res.status(200).json({ status: 'ok', timestamp: new Date() });
+    res.json({ status: "ok" });
 });
 
 // Welcome Route
 app.get('/', (req, res) => {
-    res.send("Backend is running 🚀");
+    res.send("Cortex backend is running 🚀");
 });
 
 // Routes
