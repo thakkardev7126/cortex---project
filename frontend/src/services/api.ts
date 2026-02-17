@@ -1,7 +1,11 @@
 import axios from 'axios';
 
+const API_BASE_URL =
+    import.meta.env.VITE_API_URL ||
+    'https://cortex-backend-fyud.onrender.com/api';
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL, // ✅ Vite-safe
+    baseURL: API_BASE_URL,
     withCredentials: false,
     headers: {
         'Content-Type': 'application/json',
@@ -20,7 +24,10 @@ api.interceptors.request.use((config) => {
 // Global error handling
 api.interceptors.response.use(
     (response) => response,
-    (error) => Promise.reject(error)
+    (error) => {
+        console.error('API ERROR:', error?.response || error);
+        return Promise.reject(error);
+    }
 );
 
 export default api;

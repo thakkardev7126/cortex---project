@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
+import path from 'path';
 import { PrismaClient } from '@prisma/client';
 
 import authRoutes from './routes/authRoutes';
@@ -24,9 +25,9 @@ app.use(helmet());
 app.use(cors({
     origin: [
         'http://localhost:5173',
-        'https://cortex-project.vercel.app'
+        'https://cortex-project.vercel.app',
     ],
-    credentials: true
+    credentials: true,
 }));
 
 app.use(express.json());
@@ -36,19 +37,20 @@ app.use(morgan('dev'));
 // =======================
 // Static uploads (Sandbox)
 // =======================
-app.use('/uploads', express.static('uploads'));
+const uploadDir = path.join(process.cwd(), 'uploads');
+app.use('/uploads', express.static(uploadDir));
 
 // =======================
 // Health & Root
 // =======================
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
     res.json({ status: 'ok' });
 });
 
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
     res.json({
         service: 'Cortex Backend',
-        status: 'running'
+        status: 'running',
     });
 });
 
@@ -66,7 +68,7 @@ app.use('/api/incidents', incidentsRoutes);
 // =======================
 // DB Connection Test
 // =======================
-app.get('/api/test/db-connection', async (req, res) => {
+app.get('/api/test/db-connection', async (_req, res) => {
     try {
         await prisma.$queryRaw`SELECT 1`;
         res.json({ connected: true });
@@ -79,11 +81,22 @@ app.get('/api/test/db-connection', async (req, res) => {
 // =======================
 // Global Error Handler
 // =======================
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
     console.error(err.stack);
     res.status(err.status || 500).json({
-        error: err.message || 'Internal Server Error'
+        error: err.message || 'Internal Server Error',
     });
+});
+
+// =======================
+// Prisma cleanup (Render-safe)
+// =======================
+process.on('SIGTERM', async () => {
+    await prisma.$disconnect();
+});
+
+process.on('SIGINT', async () => {
+    await prisma.$disconnect();
 });
 
 export default app;
