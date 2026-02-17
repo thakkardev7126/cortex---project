@@ -39,19 +39,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const app_1 = __importStar(require("./app"));
-const PORT = process.env.PORT || 5000;
-async function main() {
+const PORT = Number(process.env.PORT) || 5000;
+async function startServer() {
     try {
-        // Basic DB Connection Check
         await app_1.prisma.$connect();
-        console.log('✅ Connected to Database');
+        console.log("✅ Connected to database");
         app_1.default.listen(PORT, () => {
-            console.log(`🚀 Server running on http://localhost:${PORT}`);
+            console.log(`🚀 Server running on port ${PORT}`);
         });
     }
     catch (error) {
-        console.error('❌ Database connection failed:', error);
+        console.error("❌ Failed to start server:", error);
         process.exit(1);
     }
 }
-main();
+startServer();
