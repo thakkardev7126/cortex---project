@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Shield, Plus, X, AlertTriangle } from 'lucide-react';
+import { Plus, X, AlertTriangle } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -42,16 +42,20 @@ const Policies: React.FC = () => {
     const fetchPolicies = async () => {
         try {
             setLoading(true);
-            const res = await api.get('/policies'); // ✅ FIXED ENDPOINT
-            setPolicies(res.data.policies);        // ✅ FIXED RESPONSE
+            const res = await api.get('/policies');
+
+            // 🔥 FIX IS HERE
+            setPolicies(res.data.policies);
+
             setError(null);
-        } catch (err) {
+        } catch (err: any) {
             console.error('Failed to fetch policies:', err);
-            setError('Failed to load policies. Please try again.');
+            setError('Failed to load policies. Please try again later.');
         } finally {
             setLoading(false);
         }
     };
+
 
     useEffect(() => {
         fetchPolicies();
@@ -223,8 +227,8 @@ const Policies: React.FC = () => {
                             </div>
                             <span
                                 className={`px-3 py-1 rounded-full text-xs ${policy.isActive
-                                        ? 'bg-green-500/20 text-green-400'
-                                        : 'bg-slate-500/20 text-slate-400'
+                                    ? 'bg-green-500/20 text-green-400'
+                                    : 'bg-slate-500/20 text-slate-400'
                                     }`}
                             >
                                 {policy.isActive ? 'Active' : 'Inactive'}
