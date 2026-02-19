@@ -42,10 +42,14 @@ const Policies: React.FC = () => {
     const fetchPolicies = async () => {
         try {
             setLoading(true);
-            const res = await api.get('/policies');
+            const res = await api.get('/events/policies');
 
-            // 🔥 FIX IS HERE
-            setPolicies(res.data.policies);
+            // Support both API response shapes: [] and { policies: [] }
+            const policyList = Array.isArray(res.data)
+                ? res.data
+                : res.data?.policies ?? [];
+
+            setPolicies(policyList);
 
             setError(null);
         } catch (err: any) {
@@ -69,7 +73,7 @@ const Policies: React.FC = () => {
         setCreateError(null);
 
         try {
-            await api.post('/policies', {
+            await api.post('/events/policies', {
                 name: newName,
                 rule: {
                     field: newField,

@@ -46,12 +46,7 @@ const Analysis: React.FC = () => {
         formData.append('file', file); // MUST match multer.single("file")
 
         try {
-            // ✅ FIXED ENDPOINT
-            const response = await api.post('/analysis/sandbox', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+            const response = await api.post('/analysis/scan', formData);
 
             setResult(response.data);
         } catch (err: any) {
