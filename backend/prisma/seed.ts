@@ -12,6 +12,8 @@ async function main() {
         where: { email: 'admin@cortex.com' },
         update: {
             password: adminPassword,
+            role: 'ADMIN',
+            name: 'Admin User',
         },
         create: {
             email: 'admin@cortex.com',
@@ -117,7 +119,13 @@ async function main() {
     for (const policy of policies) {
         await prisma.policy.upsert({
             where: { name: policy.name },
-            update: {},
+            update: {
+                isActive: true,
+                rule: policy.rule,
+                mitreTactic: policy.mitreTactic,
+                mitreTechniqueId: policy.mitreTechniqueId,
+                mitreTechniqueName: policy.mitreTechniqueName,
+            },
             create: policy,
         });
         console.log('✅ Created policy:', policy.name);
