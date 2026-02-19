@@ -43,16 +43,22 @@ const Policies: React.FC = () => {
         try {
             setLoading(true);
 
-            let res;
-            try {
-                res = await api.get('/events/policies');
-            } catch (eventsRouteError: any) {
-                if (eventsRouteError?.response?.status === 404) {
-                    // Fallback for deployments exposing /policies directly.
-                    res = await api.get('/policies');
-                } else {
-                    throw eventsRouteError;
+            const candidates = ['/events/policies', '/policies'];
+            let res: any = null;
+            let lastError: any = null;
+
+            for (const endpoint of candidates) {
+                try {
+                    res = await api.get(endpoint);
+                    break;
+                } catch (requestError: any) {
+                    lastError = requestError;
+                    continue;
                 }
+            }
+
+            if (!res) {
+                throw lastError || new Error('Failed to fetch policies');
             }
 
             // Support both API response shapes: [] and { policies: [] }
@@ -96,14 +102,23 @@ const Policies: React.FC = () => {
                 mitreTechniqueName: newTechniqueName || null,
             };
 
-            try {
-                await api.post('/events/policies', payload);
-            } catch (eventsRouteError: any) {
-                if (eventsRouteError?.response?.status === 404) {
-                    await api.post('/policies', payload);
-                } else {
-                    throw eventsRouteError;
+            const createCandidates = ['/events/policies', '/policies'];
+            let created = false;
+            let lastError: any = null;
+
+            for (const endpoint of createCandidates) {
+                try {
+                    await api.post(endpoint, payload);
+                    created = true;
+                    break;
+                } catch (requestError: any) {
+                    lastError = requestError;
+                    continue;
                 }
+            }
+
+            if (!created) {
+                throw lastError || new Error('Failed to create policy');
             }
 
             setIsCreating(false);
