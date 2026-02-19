@@ -46,7 +46,18 @@ const Analysis: React.FC = () => {
         formData.append('file', file); // MUST match multer.single("file")
 
         try {
-            const response = await api.post('/analysis/scan', formData);
+            let response;
+
+            try {
+                response = await api.post('/analysis/scan', formData);
+            } catch (scanError: any) {
+                if (scanError?.response?.status === 404) {
+                    // Fallback for deployments still using the older sandbox route.
+                    response = await api.post('/analysis/sandbox', formData);
+                } else {
+                    throw scanError;
+                }
+            }
 
             setResult(response.data);
         } catch (err: any) {

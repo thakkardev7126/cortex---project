@@ -42,7 +42,18 @@ const Policies: React.FC = () => {
     const fetchPolicies = async () => {
         try {
             setLoading(true);
-            const res = await api.get('/events/policies');
+
+            let res;
+            try {
+                res = await api.get('/events/policies');
+            } catch (eventsRouteError: any) {
+                if (eventsRouteError?.response?.status === 404) {
+                    // Fallback for deployments exposing /policies directly.
+                    res = await api.get('/policies');
+                } else {
+                    throw eventsRouteError;
+                }
+            }
 
             // Support both API response shapes: [] and { policies: [] }
             const policyList = Array.isArray(res.data)
@@ -50,7 +61,6 @@ const Policies: React.FC = () => {
                 : res.data?.policies ?? [];
 
             setPolicies(policyList);
-
             setError(null);
         } catch (err: any) {
             console.error('Failed to fetch policies:', err);
@@ -73,7 +83,7 @@ const Policies: React.FC = () => {
         setCreateError(null);
 
         try {
-            await api.post('/events/policies', {
+            const payload = {
                 name: newName,
                 rule: {
                     field: newField,
@@ -84,7 +94,17 @@ const Policies: React.FC = () => {
                 mitreTactic: newTactic || null,
                 mitreTechniqueId: newTechniqueId || null,
                 mitreTechniqueName: newTechniqueName || null,
-            });
+            };
+
+            try {
+                await api.post('/events/policies', payload);
+            } catch (eventsRouteError: any) {
+                if (eventsRouteError?.response?.status === 404) {
+                    await api.post('/policies', payload);
+                } else {
+                    throw eventsRouteError;
+                }
+            }
 
             setIsCreating(false);
             setNewName('');
